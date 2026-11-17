@@ -36,9 +36,15 @@
 #include <sys/time.h>
 
 #ifdef __linux__
-/* strlcat is provided by libc on Darwin and the BSDs, but not by glibc. */
+/*
+ * strlcat is in Darwin's and the BSDs' libc, and in glibc since 2.38 (Ubuntu 24.04,
+ * the host this builds on). A libc that declares it cannot have a static strlcat
+ * here as well ("static declaration follows non-static declaration"), so the local
+ * one is named apart: the calls below use it on Linux, the libc's on Darwin.
+ */
+#define strlcat replacecontents_strlcat
 static size_t
-strlcat(char *dst, const char *src, size_t size)
+replacecontents_strlcat(char *dst, const char *src, size_t size)
 {
 	size_t dstlen = strnlen(dst, size);
 	size_t srclen = strlen(src);
